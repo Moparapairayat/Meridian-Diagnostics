@@ -220,31 +220,31 @@
         <mxCell id="lg1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C7F0CF;strokeColor=#16A34A;strokeWidth=2;" value="" vertex="1">
           <mxGeometry height="30" width="50" x="40" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="lg1t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=16;fontColor=#334155;" value="Start / End" vertex="1">
+        <mxCell id="lg1t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#334155;" value="Start / End" vertex="1">
           <mxGeometry height="30" width="100" x="98" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="lg2" parent="1" style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#7C5CD6;strokeWidth=2;" value="" vertex="1">
           <mxGeometry height="30" width="46" x="208" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="lg2t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=16;fontColor=#334155;" value="Process step" vertex="1">
+        <mxCell id="lg2t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#334155;" value="Process step" vertex="1">
           <mxGeometry height="30" width="115" x="262" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="lg3" parent="1" style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;strokeWidth=2;" value="" vertex="1">
           <mxGeometry height="30" width="46" x="388" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="lg3t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=16;fontColor=#334155;" value="Improved step" vertex="1">
+        <mxCell id="lg3t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#334155;" value="Improved step" vertex="1">
           <mxGeometry height="30" width="125" x="442" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="lg4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#16A34A;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=14;aspect=fixed;" value="#" vertex="1">
           <mxGeometry height="26" width="26" x="580" y="1202" as="geometry" />
         </mxCell>
-        <mxCell id="lg4t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=16;fontColor=#334155;" value="Improvement" vertex="1">
+        <mxCell id="lg4t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#334155;" value="Improvement" vertex="1">
           <mxGeometry height="30" width="115" x="614" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="lg5" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FDE68A;strokeColor=#D97706;strokeWidth=2;" value="" vertex="1">
           <mxGeometry height="36" width="42" x="740" y="1197" as="geometry" />
         </mxCell>
-        <mxCell id="lg5t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=16;fontColor=#334155;" value="Decision" vertex="1">
+        <mxCell id="lg5t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#334155;" value="Decision" vertex="1">
           <mxGeometry height="30" width="85" x="790" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="lg6" edge="1" parent="1" style="endArrow=blockThin;endFill=1;html=1;dashed=1;strokeColor=#E11D48;strokeWidth=3;labelBackgroundColor=default;defaultLabelBackgroundColor=page;">
@@ -253,7 +253,7 @@
             <mxPoint x="935" y="1215" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="lg6t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=16;fontColor=#334155;" value="Rework loop" vertex="1">
+        <mxCell id="lg6t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#334155;" value="Rework loop" vertex="1">
           <mxGeometry height="30" width="115" x="943" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="lg7" edge="1" parent="1" style="endArrow=none;html=1;dashed=1;dashPattern=2 4;strokeColor=#16A34A;strokeWidth=2.5;labelBackgroundColor=default;defaultLabelBackgroundColor=page;">
@@ -262,16 +262,16 @@
             <mxPoint x="1118" y="1215" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="lg7t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=16;fontColor=#334155;" value="Saved in record" vertex="1">
+        <mxCell id="lg7t" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#334155;" value="Saved in record" vertex="1">
           <mxGeometry height="30" width="150" x="1126" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="k1" parent="1" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F2937;strokeWidth=2.5;fontColor=#111827;fontStyle=1;shadow=1;" value="&lt;font style=&quot;font-size:30px&quot;&gt;&lt;b&gt;1&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size:16px&quot;&gt;data entry&lt;/font&gt;" vertex="1">
+        <mxCell id="k1" parent="1" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F2937;strokeWidth=2.5;fontColor=#111827;fontStyle=1;shadow=1;fontSize=15;" value="&lt;font style=&quot;font-size: 33px;&quot;&gt;&lt;b&gt;1&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 19px;&quot;&gt;data entry&lt;/font&gt;" vertex="1">
           <mxGeometry height="70" width="295" x="1310" y="1180" as="geometry" />
         </mxCell>
-        <mxCell id="k2" parent="1" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F2937;strokeWidth=2.5;fontColor=#111827;fontStyle=1;shadow=1;" value="&lt;font style=&quot;font-size:30px&quot;&gt;&lt;b&gt;5&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size:16px&quot;&gt;handoffs&lt;/font&gt;" vertex="1">
+        <mxCell id="k2" parent="1" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1F2937;strokeWidth=2.5;fontColor=#111827;fontStyle=1;shadow=1;fontSize=15;" value="&lt;font style=&quot;font-size: 33px;&quot;&gt;&lt;b&gt;5&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 19px;&quot;&gt;handoffs&lt;/font&gt;" vertex="1">
           <mxGeometry height="70" width="295" x="1625" y="1180" as="geometry" />
         </mxCell>
-        <mxCell id="k3" parent="1" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;strokeWidth=2.5;fontColor=#166534;fontStyle=1;shadow=1;" value="&lt;font style=&quot;font-size:30px&quot;&gt;&lt;b&gt;0&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size:16px&quot;&gt;WhatsApp transfers&lt;/font&gt;" vertex="1">
+        <mxCell id="k3" parent="1" style="rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;strokeWidth=2.5;fontColor=#166534;fontStyle=1;shadow=1;fontSize=15;" value="&lt;font style=&quot;font-size: 33px;&quot;&gt;&lt;b&gt;0&lt;/b&gt;&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 19px;&quot;&gt;WhatsApp transfers&lt;/font&gt;" vertex="1">
           <mxGeometry height="70" width="300" x="1940" y="1180" as="geometry" />
         </mxCell>
       </root>
