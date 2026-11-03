@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="r0mJp316bOj2AeWC6VLL">
-    <mxGraphModel dx="2396" dy="1112" grid="0" gridSize="10" guides="0" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="1">
+    <mxGraphModel dx="2049" dy="1112" grid="0" gridSize="10" guides="0" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="1">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -35,10 +35,10 @@
           <mxGeometry height="115" width="175" x="30" y="258" as="geometry" />
         </mxCell>
         <mxCell id="H3" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontColor=#000000;fontSize=20;shadow=1;roundedPerimeter=1;fontStyle=1" value="&lt;span&gt;Sample Collector&lt;/span&gt;" vertex="1">
-          <mxGeometry height="115" width="175" x="30" y="401" as="geometry" />
+          <mxGeometry height="115" width="175" x="39" y="400" as="geometry" />
         </mxCell>
         <mxCell id="H4" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontColor=#330000;fontSize=20;shadow=1;roundedPerimeter=1;" value="&lt;b&gt;Lab Technician&lt;/b&gt;" vertex="1">
-          <mxGeometry height="115" width="175" x="30" y="544" as="geometry" />
+          <mxGeometry height="115" width="175" x="42" y="545" as="geometry" />
         </mxCell>
         <mxCell id="H5" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontColor=#330000;fontSize=20;shadow=1;roundedPerimeter=1;" value="&lt;b&gt;Pathologist&lt;/b&gt;" vertex="1">
           <mxGeometry height="115" width="175" x="30" y="687" as="geometry" />
