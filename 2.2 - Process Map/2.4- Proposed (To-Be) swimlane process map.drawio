@@ -119,7 +119,7 @@
           <mxGeometry height="24" width="140" x="1247" y="644" as="geometry" />
         </mxCell>
         <mxCell id="m4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#16A34A;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1;fontSize=20;aspect=fixed;shadow=1;" value="4" vertex="1">
-          <mxGeometry height="26" width="26" x="1715" y="116" as="geometry" />
+          <mxGeometry height="26" width="26" x="1579" y="110" as="geometry" />
         </mxCell>
         <mxCell id="t4" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#86EFAC;fontColor=#166534;fontStyle=1;fontSize=20;" value="Secure portal replaces WhatsApp" vertex="1">
           <mxGeometry height="24" width="327" x="1747" y="117" as="geometry" />
