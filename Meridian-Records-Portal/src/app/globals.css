@@ -55,6 +55,22 @@ body {
   border-radius: 4px;
 }
 
+/* Sample labels: 50 × 25 mm, one label per printed page (SPEC 11). */
+@page label {
+  size: 50mm 25mm;
+  margin: 0;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+  .sample-label {
+    page: label;
+    break-after: page;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

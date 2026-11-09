@@ -218,3 +218,56 @@ Automated smoke run against a production build: all 5 roles' menus, branch badge
 - **Custom email templates are not active yet.** The Supabase free plan refuses template changes while the default email provider is used. The templates are ready (`supabase/templates/recovery.html`, `invite.html`), with their config commented out in `config.toml`. Turn them on in Phase 7, after Resend SMTP is connected. Until then the default reset email uses a `?code=` link, which `/auth/confirm` also handles. It only works in the same browser that asked for the reset.
 - **Supabase's default email service is heavily rate-limited** and only delivers to project team members. Forgot-password emails may not arrive until Resend SMTP is set up (Phase 7).
 - The navigation links to screens built in later phases (Register, Search, …), which show 404 until then.
+
+## Phase 4: Registration, orders, invoice, barcode labels, cross-branch search (2026-11-09)
+
+### Built
+- **`/staff/register`** (receptionist):
+  - One form: English name, age, sex, Bangladeshi mobile (accepts +880, spaces and dashes), optional email, language and preferred OTP channel.
+  - Test picker with prices and a live total.
+  - Required consent checkbox linking `/privacy`, and a separate optional email opt-in that starts unticked.
+  - The Server Action validates with zod, inserts the patient with the user-session client (RLS, own branch, consent version `2026-11-v1`), then calls `create_order` (order + barcodes + invoice in one transaction).
+  - It then redirects to `/staff/register?done=<orderId>`, a confirmation showing Patient ID, Order No, invoice total and samples, with **Print labels**, **Register another** and **Open patient record**. Refreshing the page does not register twice.
+- **Duplicate guard (SPEC 5.2):** if the mobile number already exists, nothing is saved. A warning lists the matching record(s) with links, and the form keeps every typed value. "This is a different person: register anyway" re-submits the same data.
+- **`/staff/labels/[orderId]`** (collector, receptionist):
+  - One Code 128 label per sample (jsbarcode SVG), showing patient code, initials, sample barcode, test code, specimen and date (Dhaka).
+  - Prints at 50 × 25 mm, one per page, using a CSS named page (`@page label`). The demo banner and staff header are hidden in print.
+- **`/staff/search`** (all staff):
+  - One box that detects the input type: Patient ID (full or prefix), mobile (full, or 4+ digits) or name (Latin, ILIKE with wildcards escaped).
+  - Searches all five branches. Results show a branch badge, the latest order status and a masked phone, plus the server time.
+  - It is a **POST Server Action, so the query text never appears in a URL or request log**. The audit row is `search` with `{ by, results }` only.
+- **`/staff/patients/[id]`**, role-based:
+  - receptionist and manager: demographics with full contact details, orders with status and invoice
+  - lab technician and pathologist: results with flag shown as text (Low/Normal/High)
+  - collector: masked contact details, status and labels link
+  - Logs `view_patient`, and `view_results` when results are shown.
+  - Receptionists get **New order**: pick tests only, then `create_order`, then the same confirmation. Barcodes continue per patient (S03, …).
+- **Pure helpers with unit tests:**
+  - `src/lib/format.ts`: masking, initials, Dhaka dates, `৳` with South Asian grouping, code regexes.
+  - `src/lib/search.ts`: query classification, LIKE escaping.
+  - `src/lib/orders.ts`: status labels and a TypeScript mirror of the transition table.
+  - `src/lib/validation/patient.ts`.
+- `src/lib/audit.ts`: `logStaffRead()` wrapper around `log_event`.
+
+### Fixed during testing
+- An empty **age** was accepted as 0 years, because `z.coerce.number('')` returns 0. Age is now parsed from the text strictly. A unit test covers it.
+
+### How to test
+- Unit tests: 29 passing.
+- **Browser end-to-end run** (Chrome, 360 px, production build, live database): 25/25 checks passed.
+  - Text errors on empty submit, and the live total.
+  - Registration confirmation and 2 labels with S01/S02.
+  - Duplicate warning that keeps typed values.
+  - North reception finds the new Central patient by code, phone and name (about 0.1 s server time, 0.4 s end-to-end), with branch badge and masked phone.
+  - New order: barcode S03, invoice total correct.
+  - Collector, lab and manager views. Collector → register and manager → labels both give 403.
+  - Audit: `search` rows contain only `{by, results}`, no phone or name anywhere in details; `view_patient`, `view_results` and the patient insert are logged.
+  - The synthetic test patient was deleted afterwards. Its audit rows remain by design.
+- **Manual:**
+  1. As reception.central, register a patient with consent, then print labels.
+  2. As reception.north, search the new Patient ID and time it with a stopwatch for the "before vs after" evidence.
+  3. As manager, check the audit rows in Supabase → Table Editor → `audit_log`.
+
+### Known issues
+- No screen to edit demographics yet. The database already allows receptionists to edit their own branch's patients (SPEC 4).
+- Next.js keeps background prefetch requests open for links to screens not built yet (Knowledge Hub etc.). Direct navigation returns 404 instantly. This goes away once those screens exist.

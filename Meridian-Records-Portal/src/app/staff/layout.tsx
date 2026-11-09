@@ -14,7 +14,7 @@ export default async function StaffLayout({ children }: LayoutProps<'/staff'>) {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="bg-surface">
+      <header className="bg-surface print:hidden">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <Link href="/staff" className="text-base font-bold text-ink">
             Meridian Records Portal
@@ -36,7 +36,7 @@ export default async function StaffLayout({ children }: LayoutProps<'/staff'>) {
         <StaffNav items={navFor(staff.role)} />
       </header>
       <IdleTimeout />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 print:m-0 print:max-w-none print:p-0">
         {children}
       </main>
     </div>
