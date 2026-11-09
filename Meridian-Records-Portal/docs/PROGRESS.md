@@ -168,3 +168,53 @@ Seeded reports have `pdf_path = null`. The PDF is generated on first view or dow
 ### Known issues
 - Each re-seed gives the portal demo patients new codes, because the sequences are not reset. Read the current codes from the seed output.
 - Audit rows from earlier seeds and test runs stay in `audit_log`, which is append-only by design.
+
+## Phase 3: Staff authentication and app shell (2026-11-09)
+
+### Built
+- **Auth pages** (Server Actions + zod, generic error messages):
+  - `/login`: email + password. Already-signed-in staff are sent to `/staff`. Messages for idle sign-out, sign-out and no access. In demo mode it lists the demo account emails, never the password.
+  - `/forgot-password`: `resetPasswordForEmail` with `redirectTo = <APP_URL>/auth/confirm?next=/reset-password`. Always the same answer, so it never reveals whether an account exists.
+  - `/auth/confirm`: `verifyOtp({ type, token_hash })` per the Supabase SSR guide (recovery, invite, email). Also `exchangeCodeForSession(code)` for Supabase's default template. `next` is validated, so open redirects are blocked.
+  - `/reset-password`: needs the session started by the email link. Rule: 10+ characters with upper and lower case letters and a number (the same rule is set in Supabase).
+  - `/auth/signout` (GET for idle, POST for the button, 303 redirect).
+- **`src/lib/auth/`:**
+  - `roles.ts` (pure): roles, labels, role → screens (SPEC 11), `safeNextPath()`.
+  - `idle.ts` (pure): 15-minute rule.
+  - `staff.ts`: `getStaff()` (`getClaims()` → `staff_profiles` + branch; null if missing or inactive), `requireStaff()`, `requireRole(...)` (→ `/staff/forbidden`).
+- **Staff shell** (`src/app/staff/layout.tsx`):
+  - Guard, plus a header with name, role, branch badge and Sign out.
+  - Role-based navigation that scrolls sideways at 360 px.
+  - `/staff` home with the role's task cards, and a 403 page at `/staff/forbidden`.
+- **Idle timeout** (SPEC 7.6):
+  - `IdleTimeout` client component: warns at 14 minutes and signs out at 15.
+  - Reports activity at most once a minute through the `touchActivity` Server Action, which refreshes an httpOnly `staff_last_active` cookie.
+  - `requireStaff()` re-checks that cookie on every request, so a stale or missing cookie signs the user out even without JavaScript.
+- **`/privacy`:** full bilingual notice (SPEC 7.5), with content in `src/lib/i18n/privacy.ts` (version `2026-11-v1`).
+- **Supabase clients** now carry the generated `Database` type.
+- **Supabase Auth config** (`supabase/config.toml`, pushed with `supabase config push`):
+  - sign-ups disabled
+  - minimum password length 10, with `lower_upper_letters_digits`
+  - redirect URL `http://localhost:3000/**`
+  - TOTP MFA kept enabled
+  - The diff was reviewed first, so only these properties changed.
+
+### How to test (manual)
+1. `npm run dev`. Sign in as each demo account. Each role sees only its own menu items:
+   - receptionist: Register, Search, Knowledge Hub
+   - collector: Collection, …
+   - lab: Lab worklist, …
+   - pathologist: Review, …
+   - manager: Dashboard, Audit log, …
+2. The header shows the branch badge. North reception shows North (NOR).
+3. Sign out → "You have signed out". Opening `/staff` after that → login.
+4. Stay idle for 14 minutes → warning. At 15 minutes → signed out with "You were signed out for security…".
+5. `/privacy` → switch to বাংলা.
+6. Forgot password → generic confirmation message (see known issues for email delivery).
+
+Automated smoke run against a production build: all 5 roles' menus, branch badges, `/login` redirect when signed in, idle sign-out (stale and missing cookie), anonymous `/staff/*` → login, bad email link → error, open-redirect blocked, privacy in both languages. All checks passed. Unit tests: 14 passing (`tests/auth.test.ts`, `tests/i18n.test.ts`).
+
+### Known issues
+- **Custom email templates are not active yet.** The Supabase free plan refuses template changes while the default email provider is used. The templates are ready (`supabase/templates/recovery.html`, `invite.html`), with their config commented out in `config.toml`. Turn them on in Phase 7, after Resend SMTP is connected. Until then the default reset email uses a `?code=` link, which `/auth/confirm` also handles. It only works in the same browser that asked for the reset.
+- **Supabase's default email service is heavily rate-limited** and only delivers to project team members. Forgot-password emails may not arrive until Resend SMTP is set up (Phase 7).
+- The navigation links to screens built in later phases (Register, Search, …), which show 404 until then.

@@ -5,6 +5,7 @@ import 'server-only';
 // and write audit rows explicitly. Never use it for staff data access.
 // scripts/*.ts must NOT import this file; they create their own client.
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/lib/database.types';
 
 export function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -13,7 +14,7 @@ export function createAdminClient() {
     throw new Error('Supabase admin client is not configured.');
   }
 
-  return createClient(url, secretKey, {
+  return createClient<Database>(url, secretKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
