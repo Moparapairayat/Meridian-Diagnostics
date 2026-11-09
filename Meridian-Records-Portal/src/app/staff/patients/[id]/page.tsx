@@ -33,7 +33,7 @@ export default async function PatientPage({ params }: PageProps<'/staff/patients
 
   const { data: orderRows } = await supabase
     .from('orders')
-    .select('id, order_no, status, created_at, released_at, retest_count, branches(name, code), invoices(amount_bdt, paid), order_items(id, test_code, sample_barcode, test_catalog(name))')
+    .select('id, order_no, status, created_at, released_at, retest_count, branches(name, code), invoices(amount_bdt, paid), reports(id, version, status), order_items(id, test_code, sample_barcode, test_catalog(name))')
     .eq('patient_id', id)
     .order('created_at', { ascending: false });
   const orders = orderRows ?? [];
@@ -128,6 +128,14 @@ export default async function PatientPage({ params }: PageProps<'/staff/patients
                       Invoice <strong>{formatBdt(order.invoices.amount_bdt)}</strong> · {order.invoices.paid ? 'paid' : 'unpaid'}
                     </span>
                   )}
+                  {showResults &&
+                    order.reports
+                      .filter((r) => r.status === 'released')
+                      .map((r) => (
+                        <a key={r.id} href={`/staff/reports/${r.id}/pdf`} target="_blank" rel="noopener" className={secondaryButtonClass}>
+                          View PDF (v{r.version})
+                        </a>
+                      ))}
                   {canPrintLabels && (
                     <Link href={`/staff/labels/${order.id}`} className={secondaryButtonClass}>
                       Labels

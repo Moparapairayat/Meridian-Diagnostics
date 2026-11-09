@@ -271,3 +271,67 @@ Automated smoke run against a production build: all 5 roles' menus, branch badge
 ### Known issues
 - No screen to edit demographics yet. The database already allows receptionists to edit their own branch's patients (SPEC 4).
 - Next.js keeps background prefetch requests open for links to screens not built yet (Knowledge Hub etc.). Direct navigation returns 404 instantly. This goes away once those screens exist.
+
+## Phase 5: Collection, lab, pathologist review, PDF reports (2026-11-09)
+
+### Built
+- **`/staff/collection`** (sample collector):
+  - "To collect" list: Print labels → Mark collected.
+  - "Collected, ready for the lab" list: Send to lab.
+  - Transitions use the user-session client (`src/lib/order-actions.ts`) with `.eq('status', from)`, so a double click is harmless. Trigger and RLS rejections are shown as plain text (`src/lib/db-errors.ts`).
+- **`/staff/lab`** (lab technician):
+  - `in_lab` worklist from all branches, with re-tests listed first.
+  - The order view has **Import from analyser (simulated)**: `src/lib/analyser.ts` gives about 15% of values out of range, half low and half high, rounded to the analyte's decimals, without rounding back onto the boundary. Values are upserted on (order item, analyte), so a re-import after a re-test replaces them.
+  - Per-value **Correct** needs a reason, and sets source `manual_correction`. The database recomputes the flag.
+  - **Submit results** only when every analyte has a value; it moves the order to `resulted`.
+  - Opening an order with values logs `view_results`.
+- **`/staff/review`** (pathologist):
+  - "To review" list. The order view shows values with L/N/H in text and the abnormal count.
+  - **E-sign & release** (confirm step).
+  - **Request re-test** (reason required; resulted → in_lab, retest_count + 1).
+  - After an action the page shows the outcome: re-test reason, or report version, verification code and View PDF.
+  - "Released" tab: View PDF and **Amend** (reason required).
+- **Release order of operations (SPEC 11.2)** in `review/actions.ts`:
+  1. `requireRole('pathologist')`
+  2. load the data with the user session
+  3. build the PDF
+  4. upload `reports/<order_id>/v1.pdf` with the admin client
+  5. `release_order()` with the user session
+  6. delete the file if step 5 fails
+
+  Amend works the same way with `v<n+1>.pdf` and `amend_report()`. The old version is superseded, and the order status does not change.
+- **PDF** (`src/lib/pdf/report.ts`, pdf-lib, English, Helvetica):
+  - A4 with header, branch, patient and order block, and Dhaka times.
+  - One table per test, with abnormal values in bold and L (low)/H (high).
+  - Page breaks for long reports.
+  - "Electronically signed by …" and a QR code to `/verify/<code>` with the code printed beside it.
+  - Diagonal "DEMO - SYNTHETIC DATA" watermark.
+  - An "AMENDED REPORT - version n" banner plus the reason.
+  - All text is sanitised to WinAnsi, so Bengali can never crash it.
+- **`src/lib/pdf/ensure.ts`:**
+  - `ensureReportPdf()` generates and stores a missing PDF on first view (for seeded reports). The portal will use it in Phase 6.
+  - Also `signedReportUrl()` (60 s), `uploadReportFile()` and `removeReportFile()`.
+  - It uses the admin client, so callers must authorise first.
+- **`/staff/reports/[reportId]/pdf`** (lab technician, pathologist): role check, RLS check on the report row, generate if missing, `view_report` audit, then a 303 redirect to a 60-second signed URL (`no-store`). Lab and pathologist also get View PDF links on the patient record.
+- **Email hooks:** `TODO(phase 7)` comments mark where `report_ready` (release) and `retest_requested` (re-test) will be sent.
+
+### How to test
+- Unit tests: 35 passing. New in `tests/lab.test.ts`: analyser distribution (11–19% out of range over 4,000 values), decimals, flags, verify-code format and uniqueness, multi-page A4 PDF, Bengali text that does not crash the PDF.
+- **Browser end-to-end run** (Chrome, production build, live database): 31/31 checks passed.
+  - register → collect → send to lab (collector → lab page is 403)
+  - import 5 values → correct one with a reason → submit
+  - re-test blocked without a reason; with a reason → in_lab, retest_count 1, lab sees the reason → re-import replaces values → submit
+  - e-sign & release → report v1, verify code, PDF in the private bucket
+  - View PDF → 303 to signed URL → PDF served; anonymous → login; receptionist → 403
+  - amend → v1 superseded, v2 with a new PDF and code, order still released
+  - a seeded report's PDF is generated on first view
+  - audit has every status move with the right role, `view_report`, and the result correction, with no result values or re-test text in details
+  - The test patient and its files were removed afterwards.
+- `npm run test:rls`: 19/19 still pass.
+- **Manual:**
+  1. Run collect → import → request re-test → import → sign.
+  2. Open the PDF and scan the QR code. It opens `/verify/<code>`, which is built in Phase 6.
+
+### Known issues
+- "Amend" issues a new signed version (new PDF, verify code, reason). Result values cannot change after release, because RLS only lets the lab write while an order is `in_lab`. This matches the SPEC data model.
+- The QR code points to `NEXT_PUBLIC_APP_URL` (localhost during development). Set it to the Vercel URL in production.
