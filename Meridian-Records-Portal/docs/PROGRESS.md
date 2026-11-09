@@ -121,3 +121,50 @@
 ### Known issues
 - The database password was generated randomly when the project was created and was not stored. To connect with a SQL client, reset it under Supabase → Project Settings → Database.
 - `kpi_summary()` is deferred to Phase 9 (as planned).
+
+## Phase 2: Seed data and RLS tests (2026-11-09)
+
+### Built
+- `scripts/lib/env.ts`: loads `.env.local` and creates the script's own admin and publishable clients. It does not import `src/lib/supabase/admin.ts`. Also holds the plus-address helper and the 6 demo staff accounts.
+- `scripts/lib/demo-data.ts`:
+  - 5 branches.
+  - 12 tests with analytes and bilingual preparation text.
+  - Fictional name lists, re-test and amendment reasons.
+  - 10 bilingual Knowledge Hub articles from SPEC §10.
+- `scripts/seed.ts` (`npm run seed`):
+  - Refuses to run unless `DEMO_MODE=true`.
+  - Wipes the demo tables (child first) and the `reports` bucket, deletes the 6 demo auth users, then recreates them with `email_confirm: true`.
+  - Inserts with the secret key, so orders go in directly in their final status with realistic historical timestamps (SPEC 5.1).
+  - Randomness comes from a fixed seed, so every run tells the same story.
+  - Patient codes and order numbers come from the database sequences, so they keep increasing on each re-seed.
+- `scripts/test-rls.ts` (`npm run test:rls`):
+  - Signs in as each demo role with the publishable key and runs the 11 SPEC §18.1 cases plus 8 extras: back-dating, the secret-key trusted path both ways, manager results, direct invoice insert, anon RPC, pathologist → downloaded, portal_otps.
+  - Writes `docs/test-results/rls.md` and exits non-zero on any FAIL.
+  - Temporary rows created for a test are removed afterwards.
+- `.env.local` was created locally (git-ignored, not committed).
+  - Supabase keys were fetched with the CLI and written without being printed.
+  - `OTP_SECRET`, `PORTAL_SESSION_SECRET`, `CRON_SECRET` and `SEED_DEMO_PASSWORD` were generated randomly.
+  - `DEMO_INBOX` is the student's Gmail.
+
+### Seeded data
+| Item | Count |
+|---|---|
+| Branches / staff / tests | 5 / 6 / 12 |
+| Patients (3 registered today, 2 with email + opt-in) | 30 |
+| Orders: registered / collected / in_lab / resulted / released / downloaded | 4 / 3 / 5 / 5 / 17 / 26 (60) |
+| Orders with a re-test (2 waiting in the lab) | 5 |
+| Amended reports (v1 superseded, v2 released) | 2 |
+| Results / report rows | 117 / 45 |
+| KB articles (2 overdue for review) | 10 |
+
+Seeded reports have `pdf_path = null`. The PDF is generated on first view or download (Phase 5).
+
+### How to test
+- `npm run seed`: prints a summary, the demo staff emails and the 2 portal demo patient codes (never the password).
+- `npm run test:rls`: **19 of 19 passed** against the live database (see `docs/test-results/rls.md`).
+- The seed was run twice in a row to confirm it can be repeated safely.
+- **Demo password:** the `SEED_DEMO_PASSWORD` line in `.env.local`. It is the same for all 6 demo staff accounts.
+
+### Known issues
+- Each re-seed gives the portal demo patients new codes, because the sequences are not reset. Read the current codes from the seed output.
+- Audit rows from earlier seeds and test runs stay in `audit_log`, which is append-only by design.
