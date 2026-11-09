@@ -50,6 +50,9 @@
 ### Decisions
 - **Cache Components is off.** create-next-app 16.4 enables `cacheComponents` and `partialPrefetching` by default. With them on, every `cookies()` read (Supabase session, `lang`) must sit behind `<Suspense>`, which conflicts with setting `<html lang>` from a cookie. Almost every page here is per-user. This can be revisited before Next.js 17, where the docs say Cache Components becomes the default.
 
+### Repository layout
+- The app lives in the `Meridian-Records-Portal/` folder of the repository. Run all npm commands from that folder, and set Vercel's **Root Directory** to `Meridian-Records-Portal`.
+
 ### Known issues
 - `npm audit` reports 4 low-severity advisories in `deepmerge`, pulled in through `@react-email/components` → `@react-email/render` → `html-to-text`. No fix is available without a breaking change. Low risk: it only renders our own templates.
 - The first Vercel deploy needs the student's accounts (GitHub + Vercel). See the Phase 0 handover notes.
