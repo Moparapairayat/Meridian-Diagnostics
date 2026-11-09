@@ -1,0 +1,20 @@
+{
+  "app.name": "মেরিডিয়ান রেকর্ডস পোর্টাল",
+  "app.org": "মেরিডিয়ান ডায়াগনস্টিকস (ডেমো)",
+  "demo.banner": "ডেমো – শুধুমাত্র কৃত্রিম (সিনথেটিক) ডেটা",
+  "a11y.skipToContent": "মূল বিষয়বস্তুতে যান",
+  "home.tagline": "সব শাখার জন্য একটি নিরাপদ রেকর্ড। রিপোর্ট নিরাপদে রোগীর কাছে পৌঁছায়।",
+  "home.staffLogin": "স্টাফ লগইন",
+  "home.staffLoginHint": "রিসেপশন, নমুনা সংগ্রহ, ল্যাব, প্যাথলজি ও ব্যবস্থাপনার জন্য",
+  "home.patientPortal": "রোগী পোর্টাল",
+  "home.patientPortalHint": "এককালীন কোড দিয়ে আপনার রিপোর্ট ডাউনলোড করুন",
+  "home.privacy": "গোপনীয়তা নোটিশ",
+  "lang.label": "ভাষা",
+  "lang.en": "English",
+  "lang.bn": "বাংলা",
+  "placeholder.comingSoon": "এই পেজটি শীঘ্রই আসছে।",
+  "placeholder.backHome": "হোমে ফিরে যান",
+  "login.title": "স্টাফ লগইন",
+  "portal.title": "রোগী পোর্টাল",
+  "privacy.title": "গোপনীয়তা নোটিশ"
+}

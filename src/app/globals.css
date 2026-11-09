@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/*
+ * Calm, accessible medical palette. Contrast against white (#fff) / page (#f5f8fa):
+ *   ink #0f2a3a ≈ 14:1, ink-muted #475569 ≈ 7.2:1, primary #0b6e74 ≈ 5.9:1,
+ *   white on primary ≈ 5.9:1, warning-fg #78350f on warning-bg #fef3c7 ≈ 9:1,
+ *   danger #b42318 ≈ 6.2:1, success #146c43 ≈ 6.4:1.
+ */
+@theme {
+  --color-page: #f5f8fa;
+  --color-surface: #ffffff;
+  --color-ink: #0f2a3a;
+  --color-ink-muted: #475569;
+  --color-border: #c4d0da;
+
+  --color-primary: #0b6e74;
+  --color-primary-hover: #08585d;
+  --color-primary-fg: #ffffff;
+  --color-primary-soft: #e3f2f2;
+
+  --color-focus: #0b4f9c;
+
+  --color-warning-bg: #fef3c7;
+  --color-warning-fg: #78350f;
+  --color-warning-border: #e0a526;
+
+  --color-danger: #b42318;
+  --color-success: #146c43;
+
+  --font-sans: var(--font-inter), var(--font-noto-bengali), ui-sans-serif, system-ui, sans-serif;
+  --font-bengali: var(--font-noto-bengali), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  font-size: 100%; /* 16px base */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+/* Bangla text reads better with the Bengali face first. */
+:lang(bn) {
+  font-family: var(--font-bengali);
+}
+
+/* Visible keyboard focus everywhere (WCAG 2.4.7 / 2.4.11). */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

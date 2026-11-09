@@ -1,0 +1,20 @@
+{
+  "app.name": "Meridian Records Portal",
+  "app.org": "Meridian Diagnostics (Demo)",
+  "demo.banner": "Demo – synthetic data only",
+  "a11y.skipToContent": "Skip to main content",
+  "home.tagline": "One secure record for every branch. Reports delivered safely to patients.",
+  "home.staffLogin": "Staff login",
+  "home.staffLoginHint": "For reception, sample collection, lab, pathology and management",
+  "home.patientPortal": "Patient portal",
+  "home.patientPortalHint": "Download your reports with a one-time code",
+  "home.privacy": "Privacy notice",
+  "lang.label": "Language",
+  "lang.en": "English",
+  "lang.bn": "বাংলা",
+  "placeholder.comingSoon": "This page is coming soon.",
+  "placeholder.backHome": "Back to home",
+  "login.title": "Staff login",
+  "portal.title": "Patient portal",
+  "privacy.title": "Privacy notice"
+}
