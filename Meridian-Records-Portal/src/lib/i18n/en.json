@@ -97,5 +97,10 @@
   "portal.prepFasting": "Fasting needed",
   "portal.prepNone": "No special preparation",
   "portal.prepSpecimen": "Sample",
-  "portal.prepAsk": "Not sure? Ask at any branch reception before your visit."
+  "portal.prepAsk": "Not sure? Ask at any branch reception before your visit.",
+  "portal.formTitle": "Log in to your reports",
+  "portal.formIntro": "We will send a one-time code to your phone or email.",
+  "portal.mockTitle": "Lab report",
+  "portal.mockSigned": "Signed by the pathologist",
+  "portal.mockVerified": "Verified"
 }

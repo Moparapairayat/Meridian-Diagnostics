@@ -65,7 +65,7 @@ function NavList({ items, onNavigate }: { items: readonly NavItem[]; onNavigate?
               href={item.href}
               onClick={onNavigate}
               aria-current={active ? 'page' : undefined}
-              className={`group flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-[0.95rem] font-medium transition-colors ${
+              className={`group flex min-h-11 items-center gap-3 rounded-md px-3 text-[0.95rem] font-medium transition-colors ${
                 active ? 'bg-surface text-ink shadow-xs ring-1 ring-line' : 'text-ink-2 hover:bg-[#ece7df] hover:text-ink'
               }`}
             >
@@ -152,7 +152,7 @@ export function StaffShell({ items, user }: { items: readonly NavItem[]; user: S
         <Link href="/staff" className="mb-7 rounded-lg px-2">
           <Logo subtitle="Records Portal" />
         </Link>
-        <p className="mb-2 px-3 text-[0.7rem] font-semibold tracking-[0.1em] text-ink-muted uppercase">Workspace</p>
+        <p className="mb-2 px-3 text-[0.7rem] font-semibold tracking-widest text-ink-muted uppercase">Workspace</p>
         <nav aria-label="Staff" className="flex-1 overflow-y-auto">
           <NavList items={items} />
         </nav>
@@ -170,7 +170,7 @@ export function StaffShell({ items, user }: { items: readonly NavItem[]; user: S
           onClick={() => setOpen(true)}
           aria-expanded={open}
           aria-controls="staff-drawer"
-          className="flex min-h-11 items-center gap-2 rounded-[10px] border border-line-strong bg-surface px-3 text-sm font-semibold text-ink"
+          className="flex min-h-11 items-center gap-2 rounded-md border border-line-strong bg-surface px-3 text-sm font-semibold text-ink"
         >
           <Menu aria-hidden="true" className="size-5" />
           Menu
@@ -183,7 +183,7 @@ export function StaffShell({ items, user }: { items: readonly NavItem[]; user: S
           <div ref={panel} className="relative flex h-full w-[85%] max-w-xs animate-slide-in flex-col bg-[#f4f1ec] px-4 py-5 shadow-lg">
             <div className="mb-6 flex items-center justify-between">
               <Logo subtitle="Records Portal" />
-              <button type="button" onClick={() => setOpen(false)} className="grid size-11 place-items-center rounded-[10px] text-ink-2 hover:bg-sunken" aria-label="Close menu">
+              <button type="button" onClick={() => setOpen(false)} className="grid size-11 place-items-center rounded-md text-ink-2 hover:bg-sunken" aria-label="Close menu">
                 <X aria-hidden="true" className="size-5" />
               </button>
             </div>

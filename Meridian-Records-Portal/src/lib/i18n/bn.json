@@ -97,5 +97,10 @@
   "portal.prepFasting": "না খেয়ে আসতে হবে",
   "portal.prepNone": "বিশেষ প্রস্তুতি নেই",
   "portal.prepSpecimen": "নমুনা",
-  "portal.prepAsk": "নিশ্চিত না হলে আসার আগে যেকোনো শাখার রিসেপশনে জিজ্ঞেস করুন।"
+  "portal.prepAsk": "নিশ্চিত না হলে আসার আগে যেকোনো শাখার রিসেপশনে জিজ্ঞেস করুন।",
+  "portal.formTitle": "রিপোর্ট দেখতে লগইন করুন",
+  "portal.formIntro": "আপনার ফোন বা ইমেইলে একটি এককালীন কোড পাঠানো হবে।",
+  "portal.mockTitle": "ল্যাব রিপোর্ট",
+  "portal.mockSigned": "প্যাথলজিস্টের স্বাক্ষরিত",
+  "portal.mockVerified": "যাচাইকৃত"
 }

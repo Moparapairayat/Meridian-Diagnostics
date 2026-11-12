@@ -1,28 +1,34 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { AuthCard } from '@/components/AuthCard';
-import { Notice } from '@/components/ui/Notice';
-import { linkClass } from '@/components/ui/styles';
+import { Alert } from '@/components/ui/primitives';
 import { getStaff, isIdle } from '@/lib/auth/staff';
 import { safeNextPath } from '@/lib/auth/roles';
-import { LoginForm } from './LoginForm';
+import { LoginForm, type DemoAccount } from './LoginForm';
 
 export const metadata: Metadata = { title: 'Staff login' };
 
-const REASON_TEXT: Record<string, { tone: 'info' | 'error'; text: string }> = {
-  idle: { tone: 'info', text: 'You were signed out for security after 15 minutes without activity.' },
-  signed_out: { tone: 'info', text: 'You have signed out.' },
-  no_access: { tone: 'error', text: 'This account does not have staff access. Contact your manager.' },
+const REASON_TEXT: Record<string, { tone: 'info' | 'danger'; title: string; text: string }> = {
+  idle: { tone: 'info', title: 'Signed out for security', text: 'You were signed out after 15 minutes without activity.' },
+  signed_out: { tone: 'info', title: 'You have signed out', text: 'See you next time.' },
+  no_access: { tone: 'danger', title: 'No staff access', text: 'This account does not have staff access. Contact your manager.' },
 };
 
-const DEMO_TAGS = ['reception.central', 'reception.north', 'collector', 'lab', 'patho', 'manager'] as const;
+const DEMO: { tag: string; role: string; branch: string }[] = [
+  { tag: 'reception.central', role: 'Receptionist', branch: 'Central' },
+  { tag: 'reception.north', role: 'Receptionist', branch: 'North' },
+  { tag: 'collector', role: 'Sample collector', branch: 'Central' },
+  { tag: 'lab', role: 'Lab technician', branch: 'Central' },
+  { tag: 'patho', role: 'Pathologist', branch: 'Central' },
+  { tag: 'manager', role: 'Manager', branch: 'Central' },
+];
 
-function demoEmails(): string[] {
+function demoAccounts(): DemoAccount[] | undefined {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE !== 'true') return undefined;
   const inbox = process.env.DEMO_INBOX;
   const at = inbox?.indexOf('@') ?? -1;
-  if (!inbox || at < 1) return DEMO_TAGS.map((tag) => `<inbox>+${tag}@…`);
-  return DEMO_TAGS.map((tag) => `${inbox.slice(0, at)}+${tag}@${inbox.slice(at + 1)}`);
+  if (!inbox || at < 1) return undefined;
+  return DEMO.map((d) => ({ email: `${inbox.slice(0, at)}+${d.tag}@${inbox.slice(at + 1)}`, role: d.role, branch: d.branch }));
 }
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
@@ -35,34 +41,21 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   if (!reasonKey && (await getStaff()) && !(await isIdle())) redirect(next);
 
   const reason = reasonKey ? REASON_TEXT[reasonKey] : undefined;
-  const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
 
   return (
-    <AuthCard title="Staff login" intro="Sign in with your work email address.">
+    <AuthCard title="Welcome back" intro="Sign in with your work email to open your worklist.">
       <div className="space-y-5">
-        {reason && <Notice tone={reason.tone}>{reason.text}</Notice>}
+        {reason && (
+          <Alert tone={reason.tone} title={reason.title}>
+            {reason.text}
+          </Alert>
+        )}
         {linkError && (
-          <Notice tone="error">That link is invalid or has expired. Request a new password reset link.</Notice>
+          <Alert tone="danger" title="Link expired">
+            That link is invalid or has expired. Request a new password reset link.
+          </Alert>
         )}
-        <LoginForm next={next} />
-        <p className="text-sm">
-          <Link href="/forgot-password" className={linkClass}>
-            Forgot your password?
-          </Link>
-        </p>
-        {demoMode && (
-          <details className="rounded-md border border-border bg-page p-4 text-sm">
-            <summary className="cursor-pointer font-semibold text-ink">Demo accounts</summary>
-            <p className="mt-2 text-ink-muted">
-              All demo accounts share the demo password set for this deployment. Data is synthetic.
-            </p>
-            <ul className="mt-2 space-y-1 break-all font-mono text-xs text-ink">
-              {demoEmails().map((email) => (
-                <li key={email}>{email}</li>
-              ))}
-            </ul>
-          </details>
-        )}
+        <LoginForm next={next} demoAccounts={demoAccounts()} />
       </div>
     </AuthCard>
   );

@@ -78,7 +78,7 @@ export function Alert({ tone = 'info', title, children, srLabel }: { tone?: keyo
   const a = ALERT[tone];
   const Icon = a.icon;
   return (
-    <div role={tone === 'danger' ? 'alert' : 'status'} className={`flex gap-3 rounded-[10px] border px-4 py-3 text-sm ${a.box}`}>
+    <div role={tone === 'danger' ? 'alert' : 'status'} className={`flex gap-3 rounded-md border px-4 py-3 text-sm ${a.box}`}>
       <Icon aria-hidden="true" className="mt-0.5 size-[1.15rem] shrink-0" />
       <div className="min-w-0 text-ink">
         <span className="sr-only">{srLabel ?? a.label}: </span>
@@ -168,7 +168,7 @@ export function PageHeader({
 
 export function EmptyState({ icon: Icon, title, description, action }: { icon: LucideIcon; title: ReactNode; description?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-[14px] border border-dashed border-line-strong bg-surface/60 px-6 py-12 text-center">
+    <div className="flex flex-col items-center rounded-lg border border-dashed border-line-strong bg-surface/60 px-6 py-12 text-center">
       <span className="grid size-12 place-items-center rounded-full bg-primary-soft text-primary">
         <Icon aria-hidden="true" className="size-6" />
       </span>
@@ -180,7 +180,7 @@ export function EmptyState({ icon: Icon, title, description, action }: { icon: L
 }
 
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div aria-hidden="true" className={`animate-pulse rounded-[10px] bg-sunken ${className}`} />;
+  return <div aria-hidden="true" className={`animate-pulse rounded-md bg-sunken ${className}`} />;
 }
 
 export function SectionTitle({ children, id, aside }: { children: ReactNode; id?: string; aside?: ReactNode }) {

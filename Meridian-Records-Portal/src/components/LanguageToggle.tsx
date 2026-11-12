@@ -7,7 +7,7 @@ import { LANGS, t, type Lang } from '@/lib/i18n';
  */
 export function LanguageToggle({ lang }: { lang: Lang }) {
   return (
-    <form action={setLanguage} aria-label={t(lang, 'lang.label')} className="inline-flex rounded-[10px] border border-line-strong bg-surface p-0.5 shadow-xs">
+    <form action={setLanguage} aria-label={t(lang, 'lang.label')} className="inline-flex rounded-md border border-line-strong bg-surface p-0.5 shadow-xs">
       {LANGS.map((option) => {
         const active = option === lang;
         return (

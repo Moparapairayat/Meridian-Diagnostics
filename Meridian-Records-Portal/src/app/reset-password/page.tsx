@@ -13,7 +13,7 @@ export default async function ResetPasswordPage() {
   if (!data?.claims?.sub) redirect('/login?error=link');
 
   return (
-    <AuthCard title="Choose a new password">
+    <AuthCard eyebrow="Account help" title="Choose a new password" intro="Pick something you have not used here before.">
       <ResetPasswordForm />
     </AuthCard>
   );

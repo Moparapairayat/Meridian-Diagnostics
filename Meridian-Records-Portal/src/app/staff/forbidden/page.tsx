@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'No access' };
 export default function ForbiddenPage() {
   return (
     <div className="py-10">
-      <p className="mb-4 text-center text-xs font-semibold tracking-[0.1em] text-ink-muted uppercase">Error 403</p>
+      <p className="mb-4 text-center text-xs font-semibold tracking-widest text-ink-muted uppercase">Error 403</p>
       <EmptyState
         icon={ShieldCheck}
         title="You do not have access to this page"

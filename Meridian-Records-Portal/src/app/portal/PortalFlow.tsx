@@ -23,7 +23,7 @@ function Message({ lang, state }: { lang: Lang; state: PortalState }) {
   return (
     <p
       role={isError ? 'alert' : 'status'}
-      className={`rounded-[10px] border px-4 py-3 text-sm ${isError ? 'border-danger-line bg-danger-bg text-danger' : 'border-[#bfdcd9] bg-primary-soft text-primary-ink'}`}
+      className={`rounded-md border px-4 py-3 text-sm ${isError ? 'border-danger-line bg-danger-bg text-danger' : 'border-[#bfdcd9] bg-primary-soft text-primary-ink'}`}
     >
       {t(lang, state.messageKey)}
     </p>
@@ -140,7 +140,7 @@ export function PortalFlow({ lang, initial }: { lang: Lang; initial: PortalState
         </div>
 
         {state.demoCode && (
-          <aside aria-label={t(lang, 'portal.demoSmsTitle')} className="animate-fade-up rounded-[14px] border border-warning-border bg-warning-bg p-4 text-warning-fg shadow-xs">
+          <aside aria-label={t(lang, 'portal.demoSmsTitle')} className="animate-fade-up rounded-lg border border-warning-border bg-warning-bg p-4 text-warning-fg shadow-xs">
             <p className="flex items-center gap-2 text-xs font-bold tracking-[0.08em] uppercase">
               <MessageSquareText aria-hidden="true" className="size-4" />
               {t(lang, 'portal.demoSmsTitle')}

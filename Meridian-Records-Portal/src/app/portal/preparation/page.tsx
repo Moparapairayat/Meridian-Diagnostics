@@ -42,7 +42,7 @@ export default async function PreparationPage() {
           {tests.map((test, i) => (
             <li
               key={test.code}
-              className="animate-fade-up rounded-[16px] border border-line bg-surface p-5 shadow-xs"
+              className="animate-fade-up rounded-2xl border border-line bg-surface p-5 shadow-xs"
               style={{ animationDelay: `${Math.min(i, 8) * 30}ms` }}
             >
               <div className="flex items-start justify-between gap-3">

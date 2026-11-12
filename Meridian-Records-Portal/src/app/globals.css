@@ -115,14 +115,20 @@ body {
   color: var(--color-ink);
 }
 
-/* Bangla text reads better with the Bengali face first. */
-:lang(bn) {
-  font-family: var(--font-bengali);
-  line-height: 1.7;
+/* Bangla reads better with the Bengali face first and a little more leading.
+ * In the base layer so utilities (leading-tight, font-mono, …) still win. */
+@layer base {
+  :lang(bn) {
+    font-family: var(--font-bengali);
+  }
+  body:lang(bn) {
+    line-height: 1.7;
+  }
 }
-:lang(bn) .font-display,
-.font-display:lang(bn) {
-  font-family: var(--font-noto-serif-bengali), var(--font-fraunces), serif;
+@layer utilities {
+  .font-display:lang(bn) {
+    font-family: var(--font-noto-serif-bengali), var(--font-fraunces), serif;
+  }
 }
 
 /* Tabular numbers for IDs, money and results. */

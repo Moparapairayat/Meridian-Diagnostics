@@ -77,7 +77,7 @@ export default async function StaffHomePage({ searchParams }: PageProps<'/staff'
             <li key={task.href} className="animate-fade-up" style={{ animationDelay: `${index * 50}ms` }}>
               <Link
                 href={task.href}
-                className={`group relative flex h-full flex-col overflow-hidden rounded-[16px] border p-5 transition-[box-shadow,transform,border-color] duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border p-5 transition-[box-shadow,transform,border-color] duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                   main ? 'border-primary bg-primary text-primary-fg shadow-sm' : 'border-line bg-surface text-ink shadow-xs hover:border-line-strong'
                 }`}
               >

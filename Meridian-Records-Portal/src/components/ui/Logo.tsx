@@ -10,13 +10,16 @@ export function LogoMark({ className = 'size-8' }: { className?: string }) {
   );
 }
 
-export function Logo({ subtitle }: { subtitle?: string }) {
+export function Logo({ subtitle, tone = 'dark' }: { subtitle?: string; tone?: 'dark' | 'light' }) {
+  const light = tone === 'light';
   return (
     <span className="inline-flex items-center gap-2.5">
       <LogoMark />
       <span className="leading-tight">
-        <span className="block font-display text-[1.05rem] font-semibold tracking-[-0.01em] text-ink">Meridian</span>
-        {subtitle && <span className="block text-[0.7rem] font-medium tracking-[0.06em] text-ink-muted uppercase">{subtitle}</span>}
+        <span className={`block font-display text-[1.05rem] font-semibold tracking-[-0.01em] ${light ? 'text-white' : 'text-ink'}`}>Meridian</span>
+        {subtitle && (
+          <span className={`block text-[0.7rem] font-medium tracking-[0.06em] uppercase ${light ? 'text-[#a9c4c6]' : 'text-ink-muted'}`}>{subtitle}</span>
+        )}
       </span>
     </span>
   );
