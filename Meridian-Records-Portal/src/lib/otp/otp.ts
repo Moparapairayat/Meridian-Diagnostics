@@ -1,7 +1,8 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { logAdminEvent } from '@/lib/audit-admin';
-import { maskPhone } from '@/lib/format';
+import { emailConfigured } from '@/lib/email/send';
+import { maskEmail, maskPhone } from '@/lib/format';
 import { normaliseLang, type Lang } from '@/lib/i18n';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
@@ -92,8 +93,10 @@ export async function issueCode(patientId: string, channel: OtpChannel, ipHash: 
     return { patientId: patient.id, destination, rateLimited: true, retryAfterSeconds: Math.ceil(decision.retryAfterMs / 1000) };
   }
 
-  // If Email is chosen but there is no email with opt-in, use SMS (demo).
-  const emailPossible = channel === 'email' && !!patient.email && patient.email_opt_in;
+  // If Email is chosen but there is no email with opt-in (or email is not
+  // configured on this deployment), use SMS (demo).
+  const wantsEmail = channel === 'email' && !!patient.email && patient.email_opt_in;
+  const emailPossible = wantsEmail && emailConfigured();
   let used: OtpChannel = emailPossible ? 'email' : 'sms_demo';
   const lang: Lang = normaliseLang(patient.language);
 
@@ -112,14 +115,19 @@ export async function issueCode(patientId: string, channel: OtpChannel, ipHash: 
     return { patientId: patient.id, destination };
   }
 
-  let result = await senders[used].send(used === 'email' ? patient.email! : patient.phone, code, lang);
-  let fellBack = false;
+  let result = await senders[used].send(used === 'email' ? patient.email! : patient.phone, code, lang, { patientId: patient.id });
+  let fellBack = wantsEmail && !emailPossible;
   if (!result.delivered && used === 'email') {
-    // Email is switched on in Phase 7; until then the demo SMS carries the code.
+    // Email failed (sendEmail recorded it): the demo SMS carries the code instead.
     used = 'sms_demo';
     fellBack = true;
     await admin.from('portal_otps').update({ channel: 'sms_demo' }).eq('id', otpId);
     result = await senders.sms_demo.send(patient.phone, code, lang);
+  }
+
+  if (used === 'email') {
+    // sendEmail already wrote the notifications row for the email.
+    return { patientId: patient.id, destination: maskEmail(patient.email!) };
   }
 
   // Every send is recorded, masked, without the code (SPEC 9).
@@ -148,7 +156,7 @@ export async function requestOtp(input: RequestOtpInput): Promise<RequestOtpOutc
   return { ...outcome, rateLimited: undefined, retryAfterSeconds: undefined };
 }
 
-export type VerifyOutcome = { ok: true; language: Lang } | { ok: false; locked: boolean };
+export type VerifyOutcome = { ok: true; language: Lang } | { ok: false; locked: boolean; justLocked?: boolean };
 
 export async function verifyOtp(patientId: string | null, code: string): Promise<VerifyOutcome> {
   if (!patientId) return { ok: false, locked: false };
@@ -176,7 +184,6 @@ export async function verifyOtp(patientId: string | null, code: string): Promise
     if (claimed?.length) {
       const { data: patient } = await admin.from('patients').select('language').eq('id', patientId).single();
       await logAdminEvent(admin, 'patient', 'portal_login', 'patients', patientId, { channel: 'otp' });
-      // TODO(phase 7): send `portal_login_alert` after the response (email + opt-in only).
       return { ok: true, language: normaliseLang(patient?.language) };
     }
   }
@@ -190,8 +197,7 @@ export async function verifyOtp(patientId: string | null, code: string): Promise
   if (shouldLock(failed)) {
     await admin.from('portal_locks').upsert({ patient_id: patientId, locked_until: new Date(Date.now() + LOCK_MS).toISOString() });
     await logAdminEvent(admin, 'patient', 'portal_locked', 'patients', patientId, { minutes: LOCK_MS / 60000 });
-    // TODO(phase 7): email the manager(s) `otp_lockout_alert` (masked patient code + time).
-    return { ok: false, locked: true };
+    return { ok: false, locked: true, justLocked: true };
   }
   return { ok: false, locked: false };
 }

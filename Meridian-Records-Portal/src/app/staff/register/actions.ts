@@ -1,6 +1,8 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
+import { notifyRegistration } from '@/lib/email/notify';
 import { requireRole } from '@/lib/auth/staff';
 import { PRIVACY_VERSION } from '@/lib/i18n/privacy';
 import { createClient } from '@/lib/supabase/server';
@@ -128,5 +130,8 @@ export async function registerPatient(prev: RegisterState, formData: FormData): 
     };
   }
 
+  // registration_confirmation after the response (email + opt-in only, no tests).
+  const patientId = patient.id;
+  after(() => notifyRegistration(patientId));
   redirect(`/staff/register?done=${orderId}`);
 }

@@ -17,6 +17,12 @@ export function maskEmail(email: string): string {
   return `${email[0]}***${email.slice(at)}`;
 }
 
+/** MD-2026-00123 -> MD-2026-***23 (for staff alerts) */
+export function maskPatientCode(code: string): string {
+  const m = /^(MD-\d{4}-)(\d+)(\d{2})$/.exec(code);
+  return m ? `${m[1]}${'*'.repeat(m[2].length)}${m[3]}` : '***';
+}
+
 /** "Rahim Uddin" -> "R.U." */
 export function initials(fullName: string): string {
   return fullName

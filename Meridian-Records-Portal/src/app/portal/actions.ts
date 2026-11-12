@@ -2,6 +2,8 @@
 
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
+import { notifyLockout, notifyPortalLogin } from '@/lib/email/notify';
 import { z } from 'zod';
 import { LANG_COOKIE } from '@/lib/i18n';
 import { OTP_RE, hashIp } from '@/lib/otp/otp-core';
@@ -72,9 +74,17 @@ export async function submitCode(prev: PortalState, formData: FormData): Promise
   if (!OTP_RE.test(code)) return { ...keep, messageKey: 'portal.wrongCode' };
 
   const outcome = await verifyOtp(pending.patientId, code);
-  if (!outcome.ok) return { ...keep, messageKey: outcome.locked ? 'portal.locked' : 'portal.wrongCode' };
+  if (!outcome.ok) {
+    if (outcome.justLocked && pending.patientId) {
+      const lockedId = pending.patientId;
+      after(() => notifyLockout(lockedId));
+    }
+    return { ...keep, messageKey: outcome.locked ? 'portal.locked' : 'portal.wrongCode' };
+  }
+  const patientId = pending.patientId!;
+  after(() => notifyPortalLogin(patientId));
 
-  await createPortalSession(pending.patientId!);
+  await createPortalSession(patientId);
   // Show the portal in the patient's registered language unless they chose one.
   const store = await cookies();
   if (!store.get(LANG_COOKIE)) {

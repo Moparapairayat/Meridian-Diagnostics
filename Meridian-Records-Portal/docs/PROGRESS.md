@@ -400,3 +400,63 @@ Automated smoke run against a production build: all 5 roles' menus, branch badge
 - The email OTP channel delivers by Demo SMS until Resend is connected in Phase 7.
 - The E2E run set some seeded `released` orders to `downloaded`. That is expected portal behaviour; `npm run seed` resets it.
 - **Windows note:** if a terminal opens the project as `d:\…` (lower-case drive), Vitest loads itself twice and every suite fails with "Cannot read properties of undefined (reading 'config')". Run the commands from `D:\meridian\Meridian-Records-Portal`.
+
+## Phase 7: Email (Resend), notifications, daily cron (2026-11-12)
+
+**Status: integrated but not yet switched on.** `RESEND_API_KEY` and `EMAIL_FROM` are still empty by choice, so OTP codes stay on Demo SMS for now. Every email path runs and records a `notifications` row (`failed`, error `email not configured`). Filling the two variables turns email on with no code change.
+
+### Built
+- **`src/lib/email/send.ts`** (server-only), following the Resend Next.js guide:
+  - `resend.emails.send({ from, to, subject, react: Template(props), tags }, { idempotencyKey })`.
+  - Never throws into the user flow; the SDK returns `{data, error}`, and network errors are caught.
+  - Always writes a `notifications` row: masked recipient, sent/failed, provider id, short error name.
+  - Never stores or logs the body, the code or the full address.
+  - `emailConfigured()` reports whether both variables are set.
+- **React Email templates** (`src/lib/email/templates/`), simple accessible HTML with a "DEMO" label:
+  - Patient templates use the patient's language (bn/en): `otp_code`, `registration_confirmation`, `report_ready`, `portal_login_alert`.
+  - Staff templates are in English: `retest_requested`, `kb_review_due`, `otp_lockout_alert`.
+  - Content strictly per SPEC 9. `report_ready` contains no test names, results, diagnoses or attachments, only "a report is ready" and the portal link.
+- **`src/lib/email/notify.ts`:** one function per event. Each picks recipients (patients only with email + opt-in; lab technicians and managers via `notify_email`), chooses the language, sets an idempotency key, and never throws.
+- **Wired hooks**, all sent with `after()` from `next/server` after the response:
+  - registration → `registration_confirmation`
+  - release and amend → `report_ready`
+  - re-test → `retest_requested` to every active lab technician
+  - successful portal login → `portal_login_alert`
+  - lockout → `otp_lockout_alert` to every active manager, with a masked patient code (`MD-2026-***23`)
+- **`EmailOtpSender`** (synchronous, so a failure is known at once). The portal uses email only when the patient has email + opt-in **and** email is configured; otherwise Demo SMS, with a note in the Demo SMS box. A failed email send also falls back to Demo SMS. When email is used, the code screen shows the masked address.
+- **`/api/cron/daily`** (GET):
+  - `Authorization: Bearer ${CRON_SECRET}` is checked with `timingSafeEqual`; otherwise 401.
+  - Runs a tiny keep-alive query.
+  - Sends `kb_review_due` to the owner of each published article with `review_date <= today` (Dhaka), at most once per article per day (checked in `notifications` by `ref_id`). Returns counts only.
+- **`vercel.json`:** `crons: [{ "path": "/api/cron/daily", "schedule": "0 22 * * *" }]` (about 04:00 in Dhaka).
+- `format.ts`: `maskPatientCode()`.
+
+### How to test
+- Unit tests: 50 passing. New in `tests/email.test.ts`:
+  - `report_ready` in bn and en contains no test names, codes, analyte names, units or digits outside the portal link, and no attachment.
+  - `otp_code` contains the code **exactly once**, plus the 5-minute expiry and "ignore if not you" (both languages).
+  - Registration, login alert and staff emails stay within SPEC 9.
+  - The lockout alert shows only the masked code.
+- **Live checks** (production build, live database, no Resend key): 13/13 passed.
+  - Cron: 401 without or with a wrong secret. One `kb_review_due` row per overdue article (2). A second run the same day sends nothing.
+  - Registration with email + opt-in → `registration_confirmation` after the response, masked recipient.
+  - Portal email choice → Demo SMS with a note, and no email OTP attempted.
+  - Login → `portal_login_alert`.
+  - 5 wrong codes → `otp_lockout_alert` to the manager.
+  - Pathologist re-test → `retest_requested` to the lab technician.
+  - Release → `report_ready` to the patient.
+  - `notifications` hold no phone, full email, code or name.
+- `npm run test:rls`: 19/19 pass.
+
+### To switch email on later (needs the student's accounts)
+1. Resend → Domains → add `notify.<your-domain>`. Add the DNS records Resend shows, then Verify. Optionally add DMARC `_dmarc.notify` = `v=DMARC1; p=none;`.
+2. Resend → API Keys → create one with **Sending access** for that domain only.
+3. In `.env.local` and Vercel, set:
+   - `RESEND_API_KEY`
+   - `EMAIL_FROM="Meridian Diagnostics (Demo) <no-reply@notify.<your-domain>>"`
+4. Resend → Integrations → Connect to Supabase, so staff reset and invite emails go through Resend SMTP. Then un-comment the two `[auth.email.template.*]` blocks in `supabase/config.toml` and run `npx supabase config push`. The free plan only allows custom templates once custom SMTP is connected.
+5. In Vercel, set `CRON_SECRET` (the same value as `.env.local`).
+
+### Known issues
+- Without a verified domain, Resend only delivers to the account owner, so the plus-address demo accounts need the domain.
+- The live checks above left `failed` rows in `notifications`. They are expected and show in the manager's notification log (Phase 9).

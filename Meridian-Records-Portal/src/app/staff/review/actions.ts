@@ -1,8 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { requireRole } from '@/lib/auth/staff';
+import { notifyReportReady, notifyRetestRequested } from '@/lib/email/notify';
 import { friendlyDbError, type ActionResult } from '@/lib/db-errors';
 import { transitionOrder } from '@/lib/order-actions';
 import { loadReportInput, reportPath } from '@/lib/pdf/data';
@@ -52,8 +54,8 @@ export async function releaseReport(_prev: ActionResult, formData: FormData): Pr
     return { error: friendlyDbError(error.code) };
   }
 
-  // TODO(phase 7): send the `report_ready` email after the response with after():
-  // patient email + opt-in only, portal link only, no test names or results (SPEC 9).
+  // report_ready after the response: email + opt-in only, portal link only (SPEC 9).
+  after(() => notifyReportReady(orderId, 1));
 
   revalidatePath('/staff/review');
   return { ok: true, message: `Signed and released. Verification code ${verifyCode}.` };
@@ -70,8 +72,9 @@ export async function requestRetest(_prev: ActionResult, formData: FormData): Pr
   });
   if (!result.ok) return result;
 
-  // TODO(phase 7): send the `retest_requested` email to lab technicians'
-  // notify_email after the response: order number + staff link only, no results.
+  // retest_requested to lab technicians after the response: order number + link only.
+  const retestOrderId = parsed.data.orderId;
+  after(() => notifyRetestRequested(retestOrderId));
 
   revalidatePath('/staff/review');
   return { ok: true, message: 'Re-test requested. The order is back in the lab.' };
@@ -123,6 +126,9 @@ export async function amendReport(_prev: ActionResult, formData: FormData): Prom
     console.warn('amend_report failed', error.code);
     return { error: friendlyDbError(error.code) };
   }
+
+  // The patient is told a (new) report is ready; still no health data.
+  after(() => notifyReportReady(orderId, version));
 
   revalidatePath('/staff/review');
   return { ok: true, message: `Version ${version} issued. The previous version is now superseded.` };

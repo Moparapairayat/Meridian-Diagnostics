@@ -11,7 +11,11 @@ export interface SendResult {
   providerMessageId?: string;
 }
 
+export interface SendContext {
+  patientId?: string;
+}
+
 export interface OtpSender {
   readonly channel: OtpChannel;
-  send(to: string, code: string, lang: Lang): Promise<SendResult>;
+  send(to: string, code: string, lang: Lang, ctx?: SendContext): Promise<SendResult>;
 }
