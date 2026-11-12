@@ -1,58 +1,146 @@
 @import "tailwindcss";
 
 /*
- * Calm, accessible medical palette. Contrast against white (#fff) / page (#f5f8fa):
- *   ink #0f2a3a ≈ 14:1, ink-muted #475569 ≈ 7.2:1, primary #0b6e74 ≈ 5.9:1,
- *   white on primary ≈ 5.9:1, warning-fg #78350f on warning-bg #fef3c7 ≈ 9:1,
- *   danger #b42318 ≈ 6.2:1, success #146c43 ≈ 6.4:1.
+ * "Calm Clinical" design system.
+ * Warm off-white canvas, deep teal-ink text, teal primary, soft warm shadows.
+ * Every text/background pair below is checked to be >= 4.5:1 (WCAG 2.2 AA)
+ * by tests/contrast.test.ts.
  */
 @theme {
-  --color-page: #f5f8fa;
+  /* Surfaces */
+  --color-canvas: #faf8f5;
+  --color-page: #faf8f5; /* legacy alias */
   --color-surface: #ffffff;
-  --color-ink: #0f2a3a;
-  --color-ink-muted: #475569;
-  --color-border: #c4d0da;
+  --color-sunken: #f3efe9;
+  --color-line: #e7e1d8;
+  --color-line-strong: #d3cbbf;
+  --color-border: #d3cbbf; /* legacy alias */
 
-  --color-primary: #0b6e74;
-  --color-primary-hover: #08585d;
+  /* Text */
+  --color-ink: #0e2a33;
+  --color-ink-2: #34505b;
+  --color-ink-muted: #586d75;
+
+  /* Brand */
+  --color-primary: #0d6b70;
+  --color-primary-hover: #0a5559;
   --color-primary-fg: #ffffff;
-  --color-primary-soft: #e3f2f2;
+  --color-primary-soft: #e6f1f0;
+  --color-primary-ink: #0a5559;
+  --color-clay: #9a4f23;
 
-  --color-focus: #0b4f9c;
+  --color-focus: #1b5fa8;
 
-  --color-warning-bg: #fef3c7;
-  --color-warning-fg: #78350f;
-  --color-warning-border: #e0a526;
-
+  /* Semantic */
+  --color-success: #1d6b45;
+  --color-success-bg: #e8f3ec;
+  --color-success-line: #b9dcc6;
+  --color-warning-fg: #7c430c;
+  --color-warning-bg: #fbf1de;
+  --color-warning-border: #e3be7d;
   --color-danger: #b42318;
-  --color-success: #146c43;
+  --color-danger-bg: #fcecea;
+  --color-danger-line: #f1c2bc;
+  --color-info: #1d5a8a;
+  --color-info-bg: #e9f1f8;
 
+  /* Type */
   --font-sans: var(--font-inter), var(--font-noto-bengali), ui-sans-serif, system-ui, sans-serif;
   --font-bengali: var(--font-noto-bengali), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-noto-serif-bengali), ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  /* Shape and depth */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-xs: 0 1px 2px rgb(41 32 20 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(41 32 20 / 0.05), 0 2px 8px -2px rgb(41 32 20 / 0.06);
+  --shadow-md: 0 2px 4px rgb(41 32 20 / 0.04), 0 12px 28px -8px rgb(41 32 20 / 0.12);
+  --shadow-lg: 0 4px 8px rgb(41 32 20 / 0.05), 0 24px 48px -12px rgb(41 32 20 / 0.18);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-up: fade-up 360ms var(--ease-out-soft) both;
+  --animate-fade-in: fade-in 240ms ease-out both;
+  --animate-slide-in: slide-in 280ms var(--ease-out-soft) both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-in {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: none;
+    }
+  }
 }
 
 html {
   font-size: 100%; /* 16px base */
   -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--color-page);
+  background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  line-height: 1.5;
+  font-feature-settings: 'cv11', 'ss01';
+  line-height: 1.55;
+}
+
+::selection {
+  background: #cfe6e4;
+  color: var(--color-ink);
 }
 
 /* Bangla text reads better with the Bengali face first. */
 :lang(bn) {
   font-family: var(--font-bengali);
+  line-height: 1.7;
+}
+:lang(bn) .font-display,
+.font-display:lang(bn) {
+  font-family: var(--font-noto-serif-bengali), var(--font-fraunces), serif;
+}
+
+/* Tabular numbers for IDs, money and results. */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Visible keyboard focus everywhere (WCAG 2.4.7 / 2.4.11). */
 :focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
+}
+
+/* Native dialog backdrop for ConfirmDialog. */
+dialog::backdrop {
+  background: rgb(14 42 51 / 0.45);
+  backdrop-filter: blur(2px);
 }
 
 /* Sample labels: 50 × 25 mm, one label per printed page (SPEC 11). */
@@ -77,5 +165,6 @@ body {
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

@@ -2,12 +2,12 @@ import { setLanguage } from '@/lib/i18n/actions';
 import { LANGS, t, type Lang } from '@/lib/i18n';
 
 /**
- * English / Bangla switch for public pages. A plain form posting to a
- * Server Action, so it works without client-side JavaScript.
+ * English / Bangla segmented switch for public pages. A plain form posting to
+ * a Server Action, so it works without client-side JavaScript.
  */
 export function LanguageToggle({ lang }: { lang: Lang }) {
   return (
-    <form action={setLanguage} aria-label={t(lang, 'lang.label')} className="flex gap-1">
+    <form action={setLanguage} aria-label={t(lang, 'lang.label')} className="inline-flex rounded-[10px] border border-line-strong bg-surface p-0.5 shadow-xs">
       {LANGS.map((option) => {
         const active = option === lang;
         return (
@@ -18,10 +18,8 @@ export function LanguageToggle({ lang }: { lang: Lang }) {
             value={option}
             lang={option}
             aria-pressed={active}
-            className={`min-h-11 min-w-11 rounded-md border px-3 text-sm font-medium transition-colors ${
-              active
-                ? 'border-primary bg-primary text-primary-fg'
-                : 'border-border bg-surface text-ink hover:bg-primary-soft'
+            className={`min-h-10 min-w-11 rounded-[8px] px-3 text-sm font-semibold transition-colors ${
+              active ? 'bg-ink text-white shadow-xs' : 'text-ink-2 hover:bg-sunken hover:text-ink'
             }`}
           >
             {t(option, `lang.${option}`)}
