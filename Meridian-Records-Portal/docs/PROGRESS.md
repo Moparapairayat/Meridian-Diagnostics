@@ -335,3 +335,68 @@ Automated smoke run against a production build: all 5 roles' menus, branch badge
 ### Known issues
 - "Amend" issues a new signed version (new PDF, verify code, reason). Result values cannot change after release, because RLS only lets the lab write while an order is `in_lab`. This matches the SPEC data model.
 - The QR code points to `NEXT_PUBLIC_APP_URL` (localhost during development). Set it to the Vercel URL in production.
+
+## Phase 6: Patient portal (OTP) and public report verification (2026-11-12)
+
+### Built
+- **`src/lib/otp/otp-core.ts`** (pure, unit-tested):
+  - 6-digit codes from `crypto.randomInt`.
+  - The database stores only `HMAC-SHA256(OTP_SECRET, otpId:code)`; codes are compared with `timingSafeEqual`.
+  - Rules: expiry, a 60-second resend cooldown, at most 3 codes per 15 minutes, and a lock on the 5th failed attempt.
+  - IP addresses are hashed, never stored raw.
+- **`src/lib/otp/otp.ts`** (server-only, admin client):
+  - **Request:** finds the patient by Patient ID + phone, checks `portal_locks` and the issue limits, inserts `portal_otps` (5-minute expiry), sends the code, and writes a `notifications` row (`otp_code`, masked recipient, no code).
+  - **Verify:** the code is single use (an atomic `used_at` claim). Failed attempts are counted within the window, and the 5th one creates a 15-minute `portal_locks` row.
+  - Audit rows (actor `patient`): `portal_login`, `portal_otp_failed`, `portal_locked`.
+  - Phase 7 TODOs: the lockout email to managers and the login alert.
+- **Senders** (`src/lib/otp/senders/`), behind the `OtpSender` interface:
+  - `DemoSmsSender` returns the code for on-screen display only when `NEXT_PUBLIC_DEMO_MODE=true`.
+  - `EmailOtpSender` is a stub until Phase 7.
+  - If Email is chosen but there is no email with opt-in, or (until Phase 7) email cannot be delivered, the code goes by Demo SMS. The page says so inside the Demo SMS box.
+- **`src/lib/portal/session.ts`** (jose HS256, `PORTAL_SESSION_SECRET`):
+  - `portal_session` holds `{sub: patient_id, sid}`. It is httpOnly, secure, `sameSite=lax`, `path=/portal` and lasts 15 minutes.
+  - A signed `portal_pending` cookie carries the step between "send code" and "enter code". It exists **whether or not the details matched** (`patientId: null`), so the page itself never reveals a match.
+- **`/portal`** (bilingual, mobile-first):
+  - Patient ID + mobile + channel, with "SMS (Demo)" and "Email (if registered)" always shown. The answer is always "If the details match, a code has been sent".
+  - The code step shows the masked destination, the Demo SMS box, a 60-second resend countdown, and "start again".
+  - Public test-preparation guidance from `test_catalog.prep_*` in the visitor's language.
+  - On login, the `lang` cookie is set to the patient's registered language if none was chosen.
+- **`/portal/reports`:** only this patient's released/downloaded orders with the current report version (amended marked), test names, and logout. **`/portal/logout`** clears the cookies.
+- **`/portal/reports/[orderId]/download`:**
+  - Re-checks the session and that the order belongs to this patient.
+  - Uses the shared `ensureReportPdf()` from Phase 5, then a 60-second signed URL (303, `no-store`).
+  - The first download sets the order to `downloaded`, which the trusted-server rule allows.
+  - Audit `portal_download` with `{report_version, first}`.
+- **`/verify/[code]`** (public, bilingual; logic in `src/lib/portal/verify.ts`):
+  - Shows Valid / Superseded / Not valid, test names, report date, version, signing pathologist and branch, and patient **initials only**. It never shows results or full details.
+  - Rate limit: 30 checks per 10 minutes per IP hash.
+  - Audit `verify_report` (actor `public`, `{result, ip_hash}`).
+- **i18n:** 61 new English and Bangla keys for the portal and verify page.
+
+### How to test
+- Unit tests: 43 passing. New in `tests/otp.test.ts`: generation (with leading zeros), HMAC bound to the OTP id, right/wrong/malformed codes, expiry, 60-second cooldown, 3 per 15 minutes, lock at 5, IP hashing.
+- **Browser end-to-end run** (Chrome at 360 px, Bangla, production build, live database): 33/33 checks passed.
+  - Bangla portal with both channels and prep guidance; no horizontal scroll.
+  - Non-matching details get the same screen with no code.
+  - Demo SMS code, and the database holds only the hash.
+  - A wrong code is rejected, the right one logs in, and a used code cannot be reused.
+  - Cookie flags are correct, and the session lasts 15 minutes or less.
+  - Download: 303 to a signed URL, the PDF is served, the order becomes `downloaded`. Another patient's order is refused; no session goes back to the portal.
+  - The email choice falls back to Demo SMS.
+  - The 5th wrong code locks the account; even the right code is refused while locked; the lock lasts 15 minutes.
+  - Logout works.
+  - Verify: valid in Bangla, initials only with no name or results; superseded flagged; unknown code is "Not valid"; rate limit works.
+  - Audit: the four portal actions (actor patient) and `verify_report` (actor public), with no code, phone, name or raw IP anywhere.
+  - Every send appears in `notifications`, masked.
+- `npm run test:rls`: 19/19 still pass.
+- **Manual (on a phone):**
+  1. Open `/portal`, switch to বাংলা, and log in with SMS (Demo).
+  2. Download the PDF.
+  3. Enter a wrong code 5 times and check it locks.
+  4. Scan the PDF's QR code and check the verify page opens.
+
+### Known issues
+- **Demo-mode caveat (SPEC 8.1):** the Demo SMS box appears only when the Patient ID and phone match, so demo mode reveals whether a pair is valid. Production would use a real SMS gateway and show nothing on screen. Rate limits are not reported on the first screen, so that does not leak a match.
+- The email OTP channel delivers by Demo SMS until Resend is connected in Phase 7.
+- The E2E run set some seeded `released` orders to `downloaded`. That is expected portal behaviour; `npm run seed` resets it.
+- **Windows note:** if a terminal opens the project as `d:\…` (lower-case drive), Vitest loads itself twice and every suite fails with "Cannot read properties of undefined (reading 'config')". Run the commands from `D:\meridian\Meridian-Records-Portal`.

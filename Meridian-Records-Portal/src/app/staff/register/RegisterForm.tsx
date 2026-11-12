@@ -80,7 +80,7 @@ export function RegisterForm({ tests }: { tests: CatalogTest[] }) {
           <legend className={labelClass}>Sex</legend>
           <div className="flex flex-wrap gap-2">
             {(['female', 'male', 'other'] as const).map((s) => (
-              <label key={s} className="flex min-h-11 items-center gap-2 rounded-md border border-border bg-surface px-3 has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
+              <label key={s} className="flex min-h-11 items-center gap-2 rounded-md border border-border bg-surface px-3 has-checked:border-primary has-checked:bg-primary-soft">
                 <input type="radio" name="sex" value={s} defaultChecked={v?.sex === s} className="size-5 accent-primary" />
                 <span className="capitalize">{s}</span>
               </label>

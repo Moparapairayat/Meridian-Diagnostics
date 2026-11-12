@@ -42,7 +42,7 @@ export function TestPicker({
       <ul className="mt-2 grid gap-2 sm:grid-cols-2">
         {tests.map((t) => (
           <li key={t.code}>
-            <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-md border border-border bg-surface px-3 py-2 has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
+            <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-md border border-border bg-surface px-3 py-2 has-checked:border-primary has-checked:bg-primary-soft">
               <input
                 type="checkbox"
                 name="tests"
